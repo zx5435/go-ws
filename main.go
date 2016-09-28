@@ -25,14 +25,12 @@ func main() {
 		log.Println("on connection")
 
 		so.Join("chat")
+
 		so.On("testcallback", func(msg string) map[string]interface{} {
 			m := make(map[string]interface{})
 			m["id"] = so.Id()
 			m["message"] = msg + msg
 			return m
-		})
-		so.On("disconnection", func() {
-			log.Println("on disconnect")
 		})
 
 		so.On("new message", func(data string) {
@@ -63,6 +61,14 @@ func main() {
 			}
 		})
 
+		so.On("typing", func(_ string) {
+			log.Println("typing", username)
+
+			m := make(map[string]interface{})
+			m["username"] = username
+			so.BroadcastTo("chat", "typing", m)
+		})
+
 		so.On("stop typing", func(_ string) {
 			log.Println("stop typing", username)
 
@@ -71,12 +77,16 @@ func main() {
 			so.BroadcastTo("chat", "stop typing", m)
 		})
 
-		so.On("typing", func(_ string) {
-			log.Println("typing", username)
+		so.On("disconnection", func() {
+			log.Println("on disconnect")
+			if username != "" {
+				numUsers--
 
-			m := make(map[string]interface{})
-			m["username"] = username
-			so.BroadcastTo("chat", "typing", m)
+				m := make(map[string]interface{})
+				m["username"] = username
+				m["numUsers"] = numUsers
+				so.BroadcastTo("chat", "user left", m)
+			}
 		})
 	})
 
