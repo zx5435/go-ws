@@ -1,12 +1,10 @@
 package main
 
 import (
-	//	"fmt"
 	"log"
 	"net/http"
 
-	"go-socket.io"
-	//	"github.com/googollee/go-socket.io"
+	"github.com/googollee/go-socket.io"
 )
 
 func main() {
@@ -44,7 +42,13 @@ func main() {
 		})
 	})
 
-	http.Handle("/socket.io/", server)
+	//http.Handle("/socket.io/", server)
+	http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://www.app-echo.com")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		server.ServeHTTP(w, r)
+	})
+
 	http.Handle("/", http.FileServer(http.Dir(".")))
 	log.Println("Serving at localhost:5000...")
 	log.Fatal(http.ListenAndServe(":5000", nil))
