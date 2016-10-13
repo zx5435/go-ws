@@ -44,7 +44,8 @@ func main() {
 
 	//http.Handle("/socket.io/", server)
 	http.HandleFunc("/socket.io/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://www.app-echo.com")
+		origin := r.Header.Get("Origin")
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		server.ServeHTTP(w, r)
 	})
