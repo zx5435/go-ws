@@ -17,7 +17,7 @@ func main() {
 		log.Println("error:", err)
 	})
 	server.On("connection", func(so socketio.Socket) {
-		log.Println("on connection")
+		log.Println(so.Id(), "on connection")
 
 		so.Join("chat")
 
@@ -28,8 +28,19 @@ func main() {
 			return m
 		})
 
+		so.On("log", func(typename, data string) {
+			log.Println(so.Id(), typename, data)
+
+			m := make(map[string]interface{})
+			m["username"] = so.Id()
+			m["type"] = typename
+			m["message"] = data
+
+			so.BroadcastTo("chat", "log", m)
+		})
+
 		so.On("new msg", func(data string) {
-			log.Println("new msg", so.Id(), data)
+			log.Println(so.Id(), "new msg", data)
 
 			m := make(map[string]interface{})
 			m["username"] = so.Id()
