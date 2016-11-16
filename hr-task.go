@@ -23,6 +23,7 @@ func main() {
 		so.Join("chat")
 
 		so.On("testcallback", func(msg string) map[string]interface{} {
+			log.Println(so.Id(), msg)
 			m := make(map[string]interface{})
 			m["id"] = so.Id()
 			m["message"] = msg + msg
